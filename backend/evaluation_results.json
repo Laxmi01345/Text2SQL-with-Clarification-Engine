@@ -1,0 +1,758 @@
+{
+  "summary": {
+    "total_tests": 10,
+    "without_clarification": {
+      "avg_accuracy": 67.9,
+      "valid_sql_count": 9,
+      "valid_sql_percent": 90.0,
+      "successful_executions": 9
+    },
+    "with_clarification": {
+      "avg_accuracy": 91.0,
+      "valid_sql_count": 10,
+      "valid_sql_percent": 100.0,
+      "successful_executions": 10
+    },
+    "improvement": {
+      "accuracy_gain": 23.1,
+      "valid_sql_gain": 10.0
+    },
+    "by_difficulty": {
+      "easy": {
+        "without_clarification": 54.6,
+        "with_clarification": 85.0,
+        "improvement": 30.4,
+        "count": 4
+      },
+      "medium": {
+        "without_clarification": 75.0,
+        "with_clarification": 95.0,
+        "improvement": 20.0,
+        "count": 3
+      },
+      "hard": {
+        "without_clarification": 78.7,
+        "with_clarification": 95.0,
+        "improvement": 16.3,
+        "count": 3
+      }
+    }
+  },
+  "details": {
+    "without_clarification": [
+      {
+        "question": "Show me top 10 cities by order count",
+        "difficulty": "easy",
+        "sql": "SELECT c.customer_city AS city, COUNT(o.order_id) AS order_count\nFROM customers c\nJOIN orders o ON o.customer_id = c.customer_id\nGROUP BY c.customer_city\nORDER BY order_count DESC\nLIMIT 10;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "city",
+            "order_count"
+          ],
+          "row_count": 10,
+          "sample_rows": [
+            [
+              "Porto Alegre",
+              17
+            ],
+            [
+              "Maceio",
+              17
+            ],
+            [
+              "Aracaju",
+              17
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 85.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 0.5,
+        "row_count_score": 1,
+        "status": "success"
+      },
+      {
+        "question": "What are the best products by revenue?",
+        "difficulty": "medium",
+        "sql": "SELECT\n  p.product_id,\n  p.product_category_name,\n  SUM(oi.price) AS total_revenue\nFROM\n  order_items AS oi\nJOIN\n  products AS p ON oi.product_id = p.product_id\nGROUP BY\n  p.product_id,\n  p.product_category_name\nORDER BY\n  total_revenue DESC\nLIMIT 100;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "product_id",
+            "product_category_name",
+            "total_revenue"
+          ],
+          "row_count": 100,
+          "sample_rows": [
+            [
+              "PROD092",
+              "sinalizacao_e_seguranca",
+              1464.0
+            ],
+            [
+              "PROD015",
+              "utilidades_domesticas",
+              1460.0
+            ],
+            [
+              "PROD053",
+              "livros_interesse_geral",
+              1436.0
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 85.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 1.0,
+        "row_count_score": 0.5,
+        "status": "success"
+      },
+      {
+        "question": "Show me monthly order trend",
+        "difficulty": "medium",
+        "sql": "SELECT date_trunc('month', o.order_purchase_timestamp) AS month, COUNT(*) AS orders_count, SUM(p.payment_value) AS total_value FROM orders o JOIN payments p ON o.order_id = p.order_id GROUP BY month ORDER BY month LIMIT 100;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "month",
+            "orders_count",
+            "total_value"
+          ],
+          "row_count": 24,
+          "sample_rows": [
+            [
+              "2017-01-01T00:00:00",
+              25,
+              10897.0
+            ],
+            [
+              "2017-02-01T00:00:00",
+              24,
+              10388.0
+            ],
+            [
+              "2017-03-01T00:00:00",
+              26,
+              11406.0
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 70.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 0.5,
+        "row_count_score": 0.5,
+        "status": "success"
+      },
+      {
+        "question": "Which payment methods are most popular?",
+        "difficulty": "easy",
+        "sql": "SELECT p.payment_type, COUNT(*) AS usage_count FROM payments p GROUP BY p.payment_type ORDER BY usage_count DESC LIMIT 100",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "payment_type",
+            "usage_count"
+          ],
+          "row_count": 4,
+          "sample_rows": [
+            [
+              "boleto",
+              150
+            ],
+            [
+              "debit_card",
+              150
+            ],
+            [
+              "voucher",
+              150
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 85.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 0.5,
+        "row_count_score": 1,
+        "status": "success"
+      },
+      {
+        "question": "Show me seller performance",
+        "difficulty": "hard",
+        "sql": "SELECT\n  s.seller_id AS seller_id,\n  s.seller_city AS city,\n  s.seller_state AS state,\n  COUNT(DISTINCT o.order_id) AS total_orders,\n  SUM(oi.price) AS total_sales,\n  AVG(oi.price) AS avg_order_value,\n  AVG(rev.review_score) AS avg_review_score,\n  SUM(pay.payment_value) AS total_payments,\n  AVG(oi.freight_value) AS avg_freight_value\nFROM\n  sellers s\n  JOIN order_items oi ON s.seller_id = oi.seller_id\n  JOIN orders o ON oi.order_id = o.order_id\n  LEFT JOIN payments pay ON o.order_id = pay.order_id\n  LEFT JOIN reviews rev ON o.order_id = rev.order_id\nGROUP BY\n  s.seller_id, s.seller_city, s.seller_state\nORDER BY\n  total_sales DESC\nLIMIT 100;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "seller_id",
+            "city",
+            "state",
+            "total_orders",
+            "total_sales",
+            "avg_order_value",
+            "avg_review_score",
+            "total_payments",
+            "avg_freight_value"
+          ],
+          "row_count": 50,
+          "sample_rows": [
+            [
+              "SELLER026",
+              "Sao Jose do Rio Preto",
+              "SP",
+              10,
+              5894.0,
+              327.44444444444446,
+              2.0,
+              8166.0,
+              37.0
+            ],
+            [
+              "SELLER038",
+              "Niteroi",
+              "RJ",
+              10,
+              5702.0,
+              316.77777777777777,
+              4.0,
+              8638.0,
+              21.0
+            ],
+            [
+              "SELLER023",
+              "Sao Bernardo do Campo",
+              "SP",
+              10,
+              5692.0,
+              316.22222222222223,
+              4.0,
+              8048.0,
+              16.0
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 66.0,
+        "keyword_score": 0.8,
+        "table_score": 1.0,
+        "column_score": 0.5,
+        "row_count_score": 0.5,
+        "status": "success"
+      },
+      {
+        "question": "Show me customer satisfaction by category",
+        "difficulty": "hard",
+        "sql": "SELECT p.product_category_name,\n       AVG(r.review_score) AS avg_score,\n       COUNT(r.review_id) AS review_count\nFROM customers c\nJOIN orders o ON o.customer_id = c.customer_id\nJOIN order_items oi ON oi.order_id = o.order_id\nJOIN products p ON p.product_id = oi.product_id\nJOIN reviews r ON r.order_id = o.order_id\nGROUP BY p.product_category_name\nORDER BY avg_score DESC\nLIMIT 100;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "product_category_name",
+            "avg_score",
+            "review_count"
+          ],
+          "row_count": 50,
+          "sample_rows": [
+            [
+              "casa_construcao",
+              4.142857142857143,
+              14
+            ],
+            [
+              "fashion_underwear_e_moda_praia",
+              4.142857142857143,
+              14
+            ],
+            [
+              "moveis_escritorio",
+              4.142857142857143,
+              14
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 85.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 1.0,
+        "row_count_score": 0.5,
+        "status": "success"
+      },
+      {
+        "question": "Show me orders by status",
+        "difficulty": "easy",
+        "sql": "",
+        "valid": false,
+        "execution_result": null,
+        "accuracy": 0,
+        "keyword_score": 0,
+        "table_score": 0,
+        "column_score": 0,
+        "row_count_score": 0,
+        "status": "generation_failed"
+      },
+      {
+        "question": "Show me total revenue by state",
+        "difficulty": "medium",
+        "sql": "SELECT c.customer_state AS state, SUM(p.payment_value) AS total_revenue\nFROM customers c\nJOIN orders o ON o.customer_id = c.customer_id\nJOIN payments p ON p.order_id = o.order_id\nGROUP BY c.customer_state\nORDER BY total_revenue DESC\nLIMIT 100;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "state",
+            "total_revenue"
+          ],
+          "row_count": 21,
+          "sample_rows": [
+            [
+              "SP",
+              47543.0
+            ],
+            [
+              "PR",
+              23321.0
+            ],
+            [
+              "SC",
+              16431.0
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 70.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 0.5,
+        "row_count_score": 0.5,
+        "status": "success"
+      },
+      {
+        "question": "Show me average order value",
+        "difficulty": "easy",
+        "sql": "SELECT o.order_id AS order_id, p.payment_value AS order_value\nFROM orders o\nJOIN payments p ON o.order_id = p.order_id\nGROUP BY o.order_id, p.payment_value\nORDER BY o.order_id\nLIMIT 100;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "order_id",
+            "order_value"
+          ],
+          "row_count": 100,
+          "sample_rows": [
+            [
+              "ORD00001",
+              37.0
+            ],
+            [
+              "ORD00001",
+              537.0
+            ],
+            [
+              "ORD00002",
+              54.0
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 48.3,
+        "keyword_score": 0.6666666666666666,
+        "table_score": 1.0,
+        "column_score": 0.0,
+        "row_count_score": 0.5,
+        "status": "success"
+      },
+      {
+        "question": "Show me product categories by number of sellers",
+        "difficulty": "hard",
+        "sql": "SELECT p.product_category_name AS category, COUNT(DISTINCT oi.seller_id) AS seller_count FROM order_items AS oi JOIN products AS p ON oi.product_id = p.product_id GROUP BY p.product_category_name ORDER BY seller_count DESC LIMIT 100;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "category",
+            "seller_count"
+          ],
+          "row_count": 50,
+          "sample_rows": [
+            [
+              "utilidades_domesticas",
+              3
+            ],
+            [
+              "artigos_festas",
+              3
+            ],
+            [
+              "artigos_mesa",
+              3
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 85.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 1.0,
+        "row_count_score": 0.5,
+        "status": "success"
+      }
+    ],
+    "with_clarification": [
+      {
+        "question": "Show me top 10 cities by order count",
+        "clarification": "Top 10 cities by number of orders",
+        "difficulty": "easy",
+        "sql": "SELECT c.customer_city AS city, COUNT(*) AS order_count\nFROM customers c\nJOIN orders o ON o.customer_id = c.customer_id\nGROUP BY c.customer_city\nORDER BY order_count DESC\nLIMIT 10;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "city",
+            "order_count"
+          ],
+          "row_count": 10,
+          "sample_rows": [
+            [
+              "Porto Alegre",
+              17
+            ],
+            [
+              "Maceio",
+              17
+            ],
+            [
+              "Aracaju",
+              17
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 85.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 0.5,
+        "row_count_score": 1,
+        "status": "success"
+      },
+      {
+        "question": "What are the best products by revenue?",
+        "clarification": "Top 10 products by total sales revenue",
+        "difficulty": "medium",
+        "sql": "SELECT p.product_id AS product_id,\n       p.product_category_name AS category,\n       SUM(oi.price) AS total_revenue\n  FROM order_items oi\n  JOIN products p ON oi.product_id = p.product_id\n  JOIN orders o ON oi.order_id = o.order_id\n  JOIN customers c ON o.customer_id = c.customer_id\n  JOIN sellers s ON oi.seller_id = s.seller_id\n  JOIN payments pay ON o.order_id = pay.order_id\n  JOIN reviews r ON o.order_id = r.order_id\n GROUP BY p.product_id, p.product_category_name\n ORDER BY total_revenue DESC\n LIMIT 10;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "product_id",
+            "category",
+            "total_revenue"
+          ],
+          "row_count": 10,
+          "sample_rows": [
+            [
+              "PROD138",
+              "telefonia_fixa",
+              1756.0
+            ],
+            [
+              "PROD176",
+              "jardinagem",
+              1732.0
+            ],
+            [
+              "PROD137",
+              "pet_shop",
+              1704.0
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 100.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 1.0,
+        "row_count_score": 1,
+        "status": "success"
+      },
+      {
+        "question": "Show me monthly order trend",
+        "clarification": "Monthly order count for 2018",
+        "difficulty": "medium",
+        "sql": "SELECT date_trunc('month', o.order_purchase_timestamp) AS month, COUNT(*) AS order_count\nFROM orders AS o\nWHERE EXTRACT(YEAR FROM o.order_purchase_timestamp) = 2018\nGROUP BY month\nORDER BY month\nLIMIT 100;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "month",
+            "order_count"
+          ],
+          "row_count": 12,
+          "sample_rows": [
+            [
+              "2018-01-01T00:00:00",
+              22
+            ],
+            [
+              "2018-02-01T00:00:00",
+              20
+            ],
+            [
+              "2018-03-01T00:00:00",
+              22
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 100.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 1.0,
+        "row_count_score": 1,
+        "status": "success"
+      },
+      {
+        "question": "Which payment methods are most popular?",
+        "clarification": "Payment type by transaction count",
+        "difficulty": "easy",
+        "sql": "SELECT p.payment_type AS payment_method, COUNT(*) AS transaction_count FROM payments p GROUP BY p.payment_type ORDER BY transaction_count DESC LIMIT 100;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "payment_method",
+            "transaction_count"
+          ],
+          "row_count": 4,
+          "sample_rows": [
+            [
+              "boleto",
+              150
+            ],
+            [
+              "debit_card",
+              150
+            ],
+            [
+              "voucher",
+              150
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 85.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 0.5,
+        "row_count_score": 1,
+        "status": "success"
+      },
+      {
+        "question": "Show me seller performance",
+        "clarification": "Top 5 sellers by average delivery time",
+        "difficulty": "hard",
+        "sql": "SELECT s.seller_id AS seller_id,\n       s.seller_city AS seller_city,\n       s.seller_state AS seller_state,\n       AVG(EXTRACT(EPOCH FROM (o.order_delivered_customer_date - o.order_approved_at))/86400) AS avg_delivery_days\nFROM sellers AS s\nJOIN order_items AS oi ON s.seller_id = oi.seller_id\nJOIN orders AS o ON oi.order_id = o.order_id\nWHERE o.order_delivered_customer_date IS NOT NULL\n  AND o.order_approved_at IS NOT NULL\nGROUP BY s.seller_id, s.seller_city, s.seller_state\nORDER BY avg_delivery_days ASC\nLIMIT 5;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "seller_id",
+            "seller_city",
+            "seller_state",
+            "avg_delivery_days"
+          ],
+          "row_count": 5,
+          "sample_rows": [
+            [
+              "SELLER044",
+              "Governador Valadares",
+              "MG",
+              1.6666666666666667
+            ],
+            [
+              "SELLER042",
+              "Juiz de Fora",
+              "MG",
+              1.6666666666666667
+            ],
+            [
+              "SELLER020",
+              "Sao Paulo",
+              "SP",
+              1.6666666666666667
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 100.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 1.0,
+        "row_count_score": 1,
+        "status": "success"
+      },
+      {
+        "question": "Show me customer satisfaction by category",
+        "clarification": "Average review score by product category, top 10",
+        "difficulty": "hard",
+        "sql": "SELECT p.product_category_name AS category, AVG(r.review_score) AS avg_score\nFROM orders o\nJOIN customers c ON o.customer_id = c.customer_id\nJOIN order_items oi ON oi.order_id = o.order_id\nJOIN products p ON oi.product_id = p.product_id\nJOIN sellers s ON oi.seller_id = s.seller_id\nJOIN payments pay ON pay.order_id = o.order_id\nJOIN reviews r ON r.order_id = o.order_id\nGROUP BY p.product_category_name\nORDER BY avg_score DESC\nLIMIT 10;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "category",
+            "avg_score"
+          ],
+          "row_count": 10,
+          "sample_rows": [
+            [
+              "casa_construcao",
+              4.166666666666667
+            ],
+            [
+              "artigos_mesa",
+              4.166666666666667
+            ],
+            [
+              "moveis_escritorio",
+              4.166666666666667
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 100.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 1.0,
+        "row_count_score": 1,
+        "status": "success"
+      },
+      {
+        "question": "Show me orders by status",
+        "clarification": "Count of orders by status",
+        "difficulty": "easy",
+        "sql": "SELECT o.order_status AS status, COUNT(*) AS order_count FROM orders AS o GROUP BY o.order_status LIMIT 100;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "status",
+            "order_count"
+          ],
+          "row_count": 8,
+          "sample_rows": [
+            [
+              "shipped",
+              63
+            ],
+            [
+              "unavailable",
+              63
+            ],
+            [
+              "invoiced",
+              63
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 70.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 0.0,
+        "row_count_score": 1,
+        "status": "success"
+      },
+      {
+        "question": "Show me total revenue by state",
+        "clarification": "Total payment value by customer state, top 10",
+        "difficulty": "medium",
+        "sql": "SELECT c.customer_state AS state, SUM(p.payment_value) AS total_revenue FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments p ON p.order_id = o.order_id GROUP BY c.customer_state ORDER BY total_revenue DESC LIMIT 10;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "state",
+            "total_revenue"
+          ],
+          "row_count": 10,
+          "sample_rows": [
+            [
+              "SP",
+              47543.0
+            ],
+            [
+              "PR",
+              23321.0
+            ],
+            [
+              "SC",
+              16431.0
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 85.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 0.5,
+        "row_count_score": 1,
+        "status": "success"
+      },
+      {
+        "question": "Show me average order value",
+        "clarification": "Average payment value per order",
+        "difficulty": "easy",
+        "sql": "SELECT AVG(total_payment) AS avg_order_value FROM (SELECT order_id, SUM(payment_value) AS total_payment FROM payments GROUP BY order_id) AS sub LIMIT 100;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "avg_order_value"
+          ],
+          "row_count": 1,
+          "sample_rows": [
+            [
+              499.8
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 100.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 1.0,
+        "row_count_score": 1,
+        "status": "success"
+      },
+      {
+        "question": "Show me product categories by number of sellers",
+        "clarification": "How many unique sellers per product category, top 10",
+        "difficulty": "hard",
+        "sql": "SELECT p.product_category_name AS category, COUNT(DISTINCT oi.seller_id) AS unique_sellers\nFROM order_items AS oi\nJOIN products AS p ON oi.product_id = p.product_id\nJOIN sellers AS s ON oi.seller_id = s.seller_id\nGROUP BY p.product_category_name\nORDER BY unique_sellers DESC\nLIMIT 10;",
+        "valid": true,
+        "execution_result": {
+          "columns": [
+            "category",
+            "unique_sellers"
+          ],
+          "row_count": 10,
+          "sample_rows": [
+            [
+              "artigos_festas",
+              3
+            ],
+            [
+              "alarmes_seguranca",
+              3
+            ],
+            [
+              "audio",
+              3
+            ]
+          ],
+          "error": null
+        },
+        "accuracy": 85.0,
+        "keyword_score": 1.0,
+        "table_score": 1.0,
+        "column_score": 0.5,
+        "row_count_score": 1,
+        "status": "success"
+      }
+    ]
+  }
+}
