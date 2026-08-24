@@ -265,36 +265,3 @@ streamlit run app.py
 | `/execute` | POST | Generate and execute SQL against PostgreSQL |
 | `/evaluate` | GET | Run evaluation (10 test questions) |
 | `/health` | GET | Health check |
-
----
-
-## Project Structure
-
-```
-text2sql/
-├── backend/
-│   ├── api/
-│   │   └── main.py              # FastAPI routes
-│   ├── llm/
-│   │   ├── gemini_client.py     # LLM client with Groq/Gemini fallback
-│   │   ├── ambiguity_detector.py # Ambiguity detection
-│   │   ├── sql_generator.py     # SQL generation
-│   │   └── clarification_engine.py # Follow-up question generator
-│   ├── models/
-│   │   └── schemas.py           # Pydantic models
-│   ├── evaluation.py            # Evaluation system
-│   ├── evaluation_dataset.json  # 10 test questions
-│   ├── evaluation_results.json  # Evaluation output
-│   └── requirements.txt
-├── frontend/
-│   └── app.py                   # Streamlit chat UI + evaluation tab
-├── database/
-│   └── sample_data.sql          # PostgreSQL schema + 500-row sample data
-└── README.md
-```
-
----
-
-## License
-
-This project is open source and available for educational purposes.
