@@ -5,6 +5,7 @@ from llm.ambiguity_detector import detect_ambiguity
 from llm.sql_generator import generate_sql
 import psycopg
 import os
+import json
 from decimal import Decimal
 from datetime import datetime, date
 from dotenv import load_dotenv
@@ -107,8 +108,11 @@ async def health_check():
     return {"status": "ok"}
 
 
-@app.get("/evaluate")
-async def run_evaluation():
-    from evaluation import run_evaluation as run_eval
-    summary, details = run_eval()
-    return {"summary": summary, "details": details}
+@app.get("/evaluation-results")
+async def get_evaluation_results():
+    results_path = os.path.join(os.path.dirname(__file__), "..", "evaluation_results.json")
+    try:
+        with open(results_path, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {"error": "Evaluation results not found"}

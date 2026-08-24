@@ -1,11 +1,12 @@
 import streamlit as st
 import httpx
 import pandas as pd
+import os
 
-API_URL = "http://localhost:8000"
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
-st.set_page_config(page_title="Text-to-SQL", page_icon=":db:", layout="wide")
-st.title("Text-to-SQL with Clarification Engine")
+st.set_page_config(page_title="Text2SQL", page_icon=":db:", layout="wide")
+st.title("Text2SQL with Clarification Engine")
 
 tab1, tab2 = st.tabs(["Chat", "Evaluation"])
 
@@ -122,12 +123,14 @@ with tab1:
 with tab2:
     st.header("Evaluation: With vs Without Clarification Engine")
 
-    if st.button("Run Evaluation (10 test questions)", type="primary"):
-        with st.spinner("Running evaluation... This may take 2-3 minutes."):
-            try:
-                response = httpx.get(f"{API_URL}/evaluate", timeout=300)
-                data = response.json()
+    with st.spinner("Loading evaluation results..."):
+        try:
+            response = httpx.get(f"{API_URL}/evaluation-results", timeout=10)
+            data = response.json()
 
+            if "error" in data:
+                st.error(data["error"])
+            else:
                 summary = data["summary"]
                 details = data["details"]
 
@@ -181,10 +184,11 @@ with tab2:
                 st.write("""
                 - **Keyword Check**: Does the SQL contain expected keywords (SELECT, JOIN, GROUP BY, etc.)?
                 - **Table Check**: Does the SQL use the correct tables?
-                - **Valid SQL Check**: Can the SQL actually execute on PostgreSQL?
-                - **Accuracy Score**: Average of keyword match + table match (0-100%)
+                - **Column Check**: Do result columns match expected columns?
+                - **Row Count Check**: Does result have expected number of rows?
+                - **Accuracy Score**: Weighted average of all checks (0-100%)
                 """)
 
-            except Exception as e:
-                st.error(f"Error running evaluation: {str(e)}")
-                st.info("Make sure the backend is running with: uvicorn api.main:app --reload --port 8000")
+        except Exception as e:
+            st.error(f"Error loading evaluation results: {str(e)}")
+            st.info("Make sure the backend is running with: uvicorn api.main:app --reload --port 8000")
