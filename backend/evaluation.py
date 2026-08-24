@@ -19,6 +19,9 @@ DELAY_BETWEEN_TESTS = 70
 
 
 def get_db_connection():
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        return psycopg.connect(database_url)
     return psycopg.connect(
         host=os.getenv("DB_HOST", "localhost"),
         dbname=os.getenv("DB_NAME", "olist_db"),
