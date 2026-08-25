@@ -3,7 +3,8 @@ from models.schemas import AmbiguityCheck
 import json
 
 
-SCHEMA = """customers(customer_id, customer_city, customer_state), orders(order_id, customer_id, order_status, order_purchase_timestamp, order_approved_at, order_delivered_customer_date), reviews(review_id, order_id, review_score, review_comment_message), payments(order_id, payment_type, payment_installments, payment_value), sellers(seller_id, seller_city, seller_state), products(product_id, product_category_name), order_items(order_id, product_id, seller_id, price, freight_value)"""
+SCHEMA = """customers(customer_id, customer_city, customer_state), orders(order_id, customer_id, order_status, order_purchase_timestamp, order_approved_at, order_delivered_customer_date), reviews(review_id, order_id, review_score, review_comment_message), payments(order_id, payment_type, payment_installments, payment_value), sellers(seller_id, seller_city, seller_state), products(product_id, product_category_name), order_items(order_id, product_id, seller_id, price, freight_value)
+Data range: 2016-09 to 2018-08"""
 
 AMBIGUITY_PROMPT = """Determine if this question needs clarification before writing SQL.
 

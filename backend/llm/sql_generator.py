@@ -4,7 +4,8 @@ import json
 
 
 SCHEMA = """customers(customer_id, customer_city, customer_state), orders(order_id, customer_id, order_status, order_purchase_timestamp, order_approved_at, order_delivered_customer_date), reviews(review_id, order_id, review_score, review_comment_message), payments(order_id, payment_type, payment_installments, payment_value), sellers(seller_id, seller_city, seller_state), products(product_id, product_category_name), order_items(order_id, product_id, seller_id, price, freight_value)
-JOINs: orders.customer_id=customers.customer_id, order_items.order_id=orders.order_id, order_items.product_id=products.product_id, order_items.seller_id=sellers.seller_id, payments.order_id=orders.order_id, reviews.order_id=orders.order_id"""
+JOINs: orders.customer_id=customers.customer_id, order_items.order_id=orders.order_id, order_items.product_id=products.product_id, order_items.seller_id=sellers.seller_id, payments.order_id=orders.order_id, reviews.order_id=orders.order_id
+Date range: All data is from 2016-09 to 2018-08. Never use NOW() or CURRENT_DATE for filtering."""
 
 SQL_PROMPT = """Generate a PostgreSQL query.
 
@@ -13,7 +14,7 @@ Schema: {schema}
 Question: {question}
 {clarification}
 
-Rules: Use aliases, LIMIT 100 default.
+Rules: Use aliases, LIMIT 100 default. Never filter with NOW() or CURRENT_DATE — use date ranges within 2016-2018 only.
 
 Return ONLY this JSON, nothing else:
 {{"query": "SELECT ...", "explanation": "what it does"}}"""
