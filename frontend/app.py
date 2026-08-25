@@ -5,8 +5,8 @@ import os
 
 try:
     API_URL = st.secrets["API_URL"]
-except:
-    API_URL = os.getenv("API_URL", "http://localhost:8000")
+except Exception:
+    API_URL = os.getenv("API_URL", "https://text2sql-with-clarification-engine.onrender.com")
 
 st.set_page_config(page_title="Text2SQL", page_icon=":db:", layout="wide")
 st.title("Text2SQL with Clarification Engine")
