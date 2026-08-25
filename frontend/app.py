@@ -3,7 +3,10 @@ import httpx
 import pandas as pd
 import os
 
-API_URL = os.getenv("API_URL", "http://localhost:8000")
+try:
+    API_URL = st.secrets["API_URL"]
+except:
+    API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="Text2SQL", page_icon=":db:", layout="wide")
 st.title("Text2SQL with Clarification Engine")
